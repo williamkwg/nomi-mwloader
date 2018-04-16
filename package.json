@@ -2,9 +2,9 @@
   "name": "nomi-mwloader",
   "version": "1.0.0",
   "description": "nomi框架 中间件loader",
-  "main": "./dist/index.js",
+  "main": "./dist/test/index.js",
   "scripts": {
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/test/index.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,11 @@
     "node"
   ],
   "author": "weiguo.kong",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^2.8.1",
+    "@types/node": "^9.6.5"
+  }
 }
