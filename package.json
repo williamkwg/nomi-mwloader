@@ -1,0 +1,22 @@
+{
+  "name": "nomi-mwloader",
+  "version": "1.0.0",
+  "description": "nomi框架 中间件loader",
+  "main": "./dist/index.js",
+  "scripts": {
+    "start": "node ./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.corp.qunar.com:fe/nomi-mwloader.git"
+  },
+  "keywords": [
+    "nomi",
+    "middleware",
+    "loader",
+    "koa",
+    "node"
+  ],
+  "author": "weiguo.kong",
+  "license": "ISC"
+}
