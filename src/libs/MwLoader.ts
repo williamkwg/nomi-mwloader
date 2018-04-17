@@ -1,10 +1,10 @@
-import { global, local } from '../config/default';
+import { global, local, mwItem, globalV, localV } from '../config/default';
 import { getFiles, importFile } from '../util/fs'
-import { middlewareI } from '../interface'
-//import { Promise } from 'es6-promise';
+import { middlewareI, configI } from '../interface'
 export class MwLoader {
-  private global: Array<middlewareI> = [];
-  private local: Array<middlewareI> = [];
+  private global: Array<middlewareI> = []; //全局的中间件集合
+  private local: Array<middlewareI> = [];  // 应用的中间件集合
+  private all: Array<middlewareI> = []; // 所有的中间件集合
   private enableGMws: Array<middlewareI> = []; // 全局启用的中间件列表
   private enableLMws: Array<middlewareI> = []; // 业务启用的中间件列表
   private allMws: Array<any> = []; // 中间件实例 中央库 (所有的：包含禁用的)
@@ -18,13 +18,12 @@ export class MwLoader {
    * @param mwDir 所有中间件的存放目录
    */
   constructor(confFile: string, mwDir: string) {
-    this.loadCong(confFile);
-    this.loadMws(mwDir);
+    this.loadCong(confFile); // 处理config文件
+    this.loadMws(mwDir); // 
   }
-  private loadCong(confFile: string) {
-    const conf = require(confFile);
-    conf && this.setGlobal(conf.global);
-    conf && this.setLocal(conf.local);
+  private async loadCong(confFile: string) {
+    const conf = await importFile(confFile);
+    conf && this.setConf(conf as configI);
     this.setEnableGlobal(this.getGlobal().filter(m => {
       return m.enable;
     }));
@@ -32,14 +31,33 @@ export class MwLoader {
       return !m.enable;
     }));
   }
+  private setConf(conf: configI) {
+    conf.global && this.setGlobal(conf.global);
+    conf.local && this.setLocal(conf.local);
+    this.setAll();
+  }
+  private setAll() {
+    this.all = this.getGlobal().map(mw => {
+      return { ...mwItem, ...mw, type: globalV };
+    })
+    .concat(
+      this.getLocal().map(mw => {
+        return { ...mwItem, ...mw, type: localV };
+      })
+    );
+  }
   private setGlobal(mws: Array<middlewareI> = global) {
     this.global = mws;
   }
   private setLocal(mws: Array<middlewareI> = local) {
     this.local = mws;
   }
-  private async loadMws(mwDir: string) {
-    const mws = getFiles(mwDir);
+  /**
+   * 根据目录 读取文件 并返回 export default 的对象
+   * @param dir 
+   */
+  private async getMwList(dir: string) {
+    const mws = getFiles(dir);
     const result = await mws.map(async file => {
       try {
         return await importFile(file);
@@ -47,15 +65,12 @@ export class MwLoader {
         console.log(`load middlewares error`);
       }
     });
-    return result;
-    /*
-    Promise.all(mws.map(file => {
-      return import(file);
-    })).then(result => {
-       return result.map(f => {return f.default});
-    }).catch(err => {
-      console.info(`load middlewares error`)
-    });*/
+    return result || [];
+    /*Promise.all(mws.map(file => { return import(file);})).then()*/
+  }
+  private async loadMws(mwDir: string) {
+    const result = await this.getMwList(mwDir);
+    this.allMws = result; // 设置所有的
   }
   private setEnableGlobal(mws: Array<middlewareI>) {
     this.enableGMws = mws;

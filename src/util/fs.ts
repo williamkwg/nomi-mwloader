@@ -3,16 +3,25 @@ import { join, extname } from 'path';
 import { Promise } from 'es6-promise';
 import { resolve } from 'url';
 
-export const importFile = (file) => {
+/**
+ * 根据文件地址 异步的动态引入文件 并返回promise.resolve(default对象)
+ * @param file : 文件地址
+ */
+export const importFile = (file: string) => {
   return new Promise((resolve, reject) => {
     import(file).then(result => {
       if (result && result.default) {
-        resolve(result);
+        resolve(result.default);
       }
       reject(result);
     });
   });
 }
+/**
+ * 递归读取dir目录下 所有后缀为postfix 的文件 
+ * @param dir 
+ * @param postfix 
+ */
 export const getFiles = (dir: string, postfix: string | Array<string> = ['.js', '.ts']): Array<string> => {
   postfix = typeof postfix === 'string' ? [postfix] : postfix;
   const files: Array<string> = [];
