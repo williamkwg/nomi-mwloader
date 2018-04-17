@@ -20,6 +20,7 @@
   "author": "weiguo.kong",
   "license": "ISC",
   "dependencies": {
+    "es6-promise": "^4.2.4"
   },
   "devDependencies": {
     "typescript": "^2.8.1",
