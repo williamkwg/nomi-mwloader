@@ -135,7 +135,7 @@ class MwLoader {
     /**
      * 对外暴露API：加载传入的应用程序的中间件  + loader会默认加载全局中间件，调用方只需要传入业务的中间件列表即可
      * mwLoaderInstance.use(app, mws)
-     * @param app: koa实例 
+     * @param app: koa实例
      * @param mws: 业务中间件名称 | 列表
      */
     async use(app, localMws) {
@@ -145,7 +145,7 @@ class MwLoader {
         await this.loadCong(this.config); // 处理config文件
         const mws = this.getMws(); // 启用状态的中间件库
         const globalMws = this.getEnableGMwNames();
-        const mwList = new Array();
+        const mwList = [];
         let instance = null;
         globalMws.concat(localMws).forEach(name => {
             if (mws.has(name)) {

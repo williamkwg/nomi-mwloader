@@ -158,7 +158,7 @@ export class MwLoader {
     await this.loadCong(this.config); // 处理config文件
     const mws = this.getMws(); // 启用状态的中间件库
     const globalMws = this.getEnableGMwNames();
-    const mwList = new Array();
+    const mwList: Array<any> = [];
     let instance = null;
     globalMws.concat(localMws).forEach(name => { //应用的所有中间件 = 启用的全局中间件 + 传入的业务中间件 
       if (mws.has(name)) { // 过滤禁用的中间件
