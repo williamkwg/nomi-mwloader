@@ -1,6 +1,7 @@
+
 import { global, local, mwItem, globalV, localV } from '../config/default';
 import { getFiles, importFile } from '../util/fs'
-import { middlewareI, configI, koaI } from '../interface'
+import { middlewareI, configI, koaI, Map } from '../interface'
 import compose = require('koa-compose');
 export class MwLoader {
   private global: Array<middlewareI> = []; //全局的中间件 配置
@@ -13,6 +14,7 @@ export class MwLoader {
   private mws: Map<string, middlewareI> = new Map(); // 所有启用状态 中间件实例 中央库 
   private enableGMws: Map<string, middlewareI> = new Map(); // 启用状态的全局中间件实例 映射池
   private mwDir: string;
+  private config: string;
 
   /**
    * 中间件加载模块 处理中间件 
@@ -20,7 +22,7 @@ export class MwLoader {
    * @param mwDir 所有中间件的存放目录
    */
   constructor(confFile: string, mwDir: string) {
-    this.loadCong(confFile); // 处理config文件
+    this.config = confFile;
     this.mwDir = mwDir;
   }
   /**
@@ -149,12 +151,12 @@ export class MwLoader {
    * @param app: koa实例
    * @param mws: 业务中间件名称 | 列表  
    */
-  use(app: koaI, localMws: string | Array<string>) {
+  async use(app: koaI, localMws: string | Array<string>) {
     if (typeof localMws === 'string') {
       localMws = [localMws];
     }
+    await this.loadCong(this.config); // 处理config文件
     const mws = this.getMws(); // 启用状态的中间件库
-    const gMws = this.getEnableGMws(); // 启用状态的全局中间件池
     const globalMws = this.getEnableGMwNames();
     const mwList = new Array();
     let instance = null;

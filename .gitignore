@@ -40,5 +40,3 @@ Thumbs.db
 # *.tar.gz
 
 node_modules
-*.js
-config

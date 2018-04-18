@@ -1,6 +1,6 @@
 export default class localA {
-  constructor(options) {
-    return async (ctx, next) => {
+  constructor(options: object) {
+    return async (ctx: object, next: Function) => {
       console.log('local A');
       next();
     }
