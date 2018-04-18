@@ -20,10 +20,13 @@
   "author": "weiguo.kong",
   "license": "ISC",
   "dependencies": {
-    "es6-promise": "^4.2.4"
+    "es6-promise": "^4.2.4",
+    "koa-compose": "^4.0.0"
   },
   "devDependencies": {
-    "typescript": "^2.8.1",
-    "@types/node": "^9.6.5"
+    "@types/koa": "^2.0.45",
+    "@types/node": "^9.6.5",
+    "koa": "^2.5.0",
+    "typescript": "^2.8.1"
   }
 }
