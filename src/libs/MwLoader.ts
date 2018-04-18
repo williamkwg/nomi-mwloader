@@ -161,7 +161,7 @@ export class MwLoader {
     globalMws.concat(localMws).forEach(name => { //应用的所有中间件 = 启用的全局中间件 + 传入的业务中间件 
       if (mws.has(name)) { // 过滤禁用的中间件
         instance = mws.get(name);
-        mwList.push(new instance.instance(instance.options)); //将中间件函数对象存入集合
+        instance && mwList.push(new instance.instance(instance.options)); //将中间件函数对象存入集合
       };
     });
     app.use(compose(mwList)); //应用的中间件流-队列
