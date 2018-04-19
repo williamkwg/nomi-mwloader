@@ -14,7 +14,7 @@ exports.importFile = (file) => {
                 resolve(result.default);
             }
             reject(result);
-        });
+        }).catch(err => { });
     });
 };
 /**

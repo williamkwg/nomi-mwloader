@@ -14,7 +14,7 @@ export const importFile = (file: string) => {
         resolve(result.default);
       }
       reject(result);
-    });
+    }).catch(err => {});
   });
 }
 /**
