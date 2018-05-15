@@ -20,22 +20,19 @@ class MwLoader {
         this.allMws = new Map(); // 所有的 中间件实例 中央库
         this.mws = new Map(); // 所有启用状态 中间件实例 中央库 
         this.enableGMws = new Map(); // 启用状态的全局中间件实例 映射池
-        this.status = false;
         this.config = confFile;
         this.mwDir = mwDir;
-        this.loadCong(this.config); // 处理config文件
     }
     /**
      * 根据配置文件 收集中间件实例
      * @param confFile
      */
-    async loadCong(confFile) {
-        const conf = await fs_1.importFile(confFile);
+    async run() {
+        const conf = await fs_1.importFile(this.config);
         conf && this.setConf(conf);
         await this.gatherEnableGMws();
         this.gatherAll();
         await this.gatherAllMws();
-        this.status = true;
     }
     /**
      * 处理 配置文件
@@ -71,7 +68,7 @@ class MwLoader {
     async gatherEnableGMws() {
         const enableGMws = this.enableGMws, mwDir = this.mwDir, enableGMwConfs = this.enableGMwConfs;
         enableGMws.clear();
-        await enableGMwConfs.forEach(async (m) => {
+        for (let m of enableGMwConfs) {
             await fs_1.importFile(m.package || path_1.join(mwDir, m.name)).then(instance => {
                 if (!enableGMws.has(m.name)) {
                     //收集所有的中间件实例 确定映射关系 存入中央库备用
@@ -81,7 +78,7 @@ class MwLoader {
                     console.error(`全局中间件${m.name}重复定义`);
                 }
             });
-        });
+        }
     }
     /**
      * 收集 所有中间件实例 => 中央库
@@ -90,21 +87,23 @@ class MwLoader {
         const all = this.all, allMws = this.allMws, mws = this.mws, mwDir = this.mwDir;
         allMws.clear();
         mws.clear();
-        await all.length && all.forEach(async (m) => {
-            await fs_1.importFile(m.package || path_1.join(mwDir, m.name)).then(instance => {
-                if (!allMws.has(m.name)) {
-                    //收集所有的中间件实例 确定映射关系 存入中央库备用
-                    allMws.set(m.name, Object.assign({}, m, { instance }));
-                }
-                else {
-                    console.error(`中间件${m.name}重复定义`);
-                }
-                if (m.enable && !mws.has(m.name)) {
-                    //收集启用状态的的中间件实例 确定映射关系 存入有效中央库备用
-                    mws.set(m.name, Object.assign({}, m, { instance }));
-                }
-            });
-        });
+        if (all.length) {
+            for (let m of all) {
+                await fs_1.importFile(m.package || path_1.join(mwDir, m.name)).then(instance => {
+                    if (!allMws.has(m.name)) {
+                        //收集所有的中间件实例 确定映射关系 存入中央库备用
+                        allMws.set(m.name, Object.assign({}, m, { instance }));
+                    }
+                    else {
+                        console.error(`中间件${m.name}重复定义`);
+                    }
+                    if (m.enable && !mws.has(m.name)) {
+                        //收集启用状态的的中间件实例 确定映射关系 存入有效中央库备用
+                        mws.set(m.name, Object.assign({}, m, { instance }));
+                    }
+                });
+            }
+        }
     }
     getEnableGMws() {
         return this.enableGMws;
@@ -146,20 +145,19 @@ class MwLoader {
         if (typeof localMws === 'string') {
             localMws = [localMws];
         }
-        !this.status && await this.gatherAllMws().then(res => {
-            const mws = this.getMws(); // 启用状态的中间件库
-            const globalMws = this.getEnableGMwNames();
-            const mwList = [];
-            let instance = null;
-            globalMws.concat(localMws).forEach(name => {
-                if (mws.has(name)) {
-                    instance = mws.get(name);
-                    instance && mwList.push(new instance.instance(instance.options)); //将中间件函数对象存入集合
-                }
-                ;
-            });
-            app.use(compose(mwList)); //应用的中间件流-队列
+        await this.run();
+        const mws = this.getMws(); // 启用状态的中间件库
+        const globalMws = this.getEnableGMwNames();
+        const mwList = [];
+        let instance = null;
+        globalMws.concat(localMws).forEach(name => {
+            if (mws.has(name)) {
+                instance = mws.get(name);
+                instance && mwList.push(new instance.instance(instance.options)); //将中间件函数对象存入集合
+            }
+            ;
         });
+        app.use(compose(mwList)); //应用的中间件流-队列
     }
 }
 exports.MwLoader = MwLoader;
