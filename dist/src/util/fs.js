@@ -14,7 +14,9 @@ exports.importFile = (file) => {
                 resolve(result.default);
             }
             reject(result);
-        }).catch(err => { });
+        }).catch(err => {
+            console.log('read file error, uri:', file);
+        });
     });
 };
 /**

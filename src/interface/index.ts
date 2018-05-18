@@ -12,11 +12,6 @@ export interface configI {
   local: Array<any>
 }
 
-export interface koaI {
-  listen: Function,
-  use: Function
-}
-
 export interface Map<K, V> {
   clear(): void;
   delete(key: K): boolean;
