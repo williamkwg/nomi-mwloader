@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class localA {
+class localB {
     constructor(options) {
         return async (ctx, next) => {
-            console.log('local A into');
+            console.log('local B into');
             next();
-            console.log('local A back');
+            console.log('local B back');
         };
     }
 }
-exports.default = localA;
+exports.default = localB;
 ;
