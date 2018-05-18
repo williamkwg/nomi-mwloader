@@ -106,7 +106,6 @@ export class MwLoader {
       mws = this.mws,
       enableGMwList = this.enableGMwList,
       mwDir = this.mwDir;
-    let mwInstance = null;
     allMws.clear();
     mws.clear();
     if (all.length) {
