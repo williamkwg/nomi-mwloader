@@ -146,7 +146,7 @@ export class MwLoader {
     this.ready() || await this.run(); // lazy load config, and ensure that only run once 
     const enableLocalMws = this.getEnableLocalMws(); // all enabled local middleware warehouse
     // in the process of the request, use variable mwList to store all valid middleware
-    const mwList: Array<any> = this.getEnableGMwList(); // the initial value is enabled global middleware list
+    const mwList: Array<any> = this.getEnableGMwList().concat([]); // the initial value is enabled global middleware list
     const localMwCache = this.getLocalMwCache(); // the cache for local middleware
     let instance = null;
     localMws.forEach(name => {
