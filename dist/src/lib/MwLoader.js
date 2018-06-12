@@ -27,9 +27,15 @@ class MwLoader {
      * @param confFile
      */
     async run() {
+        let config = {};
         console.log(`middleware loader module read config file success`);
-        const conf = await fs_1.importFile(this.configuration); // import the configuration file of all middleware 
-        conf && this.setConf(conf); // cache configuration
+        if (typeof this.configuration === 'string') {
+            config = await fs_1.importFile(this.configuration); // import the configuration file of all middleware 
+        }
+        else {
+            config = this.configuration;
+        }
+        config && this.setConf(config); // cache configuration
         await this.gatherEnableGMws(); //  gather all of the enabled global middleware
         await this.gatherEnableLMws(); // cache all middleware instance 
     }
@@ -55,13 +61,20 @@ class MwLoader {
     async gatherEnableGMws() {
         const enableGMws = this.getEnableGlobalMws(), mwDir = this.mwDir, enableGMwList = this.enableGMwList, enableGMwConfs = this.enableGMwConfs;
         enableGMws.clear();
+        let instance = null;
         for (let m of enableGMwConfs) {
             await fs_1.importFile(m.package || path_1.join(process.cwd(), mwDir, m.name)).then(instance => {
                 if (!enableGMws.has(m.name)) {
                     //gather the middleware instance collection to the map warehouse named enableGMWs
                     enableGMws.set(m.name, Object.assign({}, m, { instance }));
                     // storage all enabled middleware instance
-                    enableGMwList.push(new ((enableGMws.get(m.name) || { instance }).instance)(m.options));
+                    if (m.arguments && m.arguments.length) {
+                        instance = fs_1.create.apply(null, [(enableGMws.get(m.name) || { instance }).instance].concat(m.arguments));
+                    }
+                    else {
+                        instance = m.instance;
+                    }
+                    enableGMwList.push(instance);
                 }
                 else {
                     console.error(`the glabal middleware: ${m.name} has been defined!`);
@@ -135,21 +148,28 @@ class MwLoader {
         this.ready() || await this.run(); // lazy load config, and ensure that only run once 
         const enableLocalMws = this.getEnableLocalMws(); // all enabled local middleware warehouse
         // in the process of the request, use variable mwList to store all valid middleware
-        const mwList = this.getEnableGMwList(); // the initial value is enabled global middleware list
+        const mwList = this.getEnableGMwList().concat([]); // the initial value is enabled global middleware list
         const localMwCache = this.getLocalMwCache(); // the cache for local middleware
+        let instanceOpts = null;
         let instance = null;
         localMws.forEach(name => {
             if (enableLocalMws.has(name)) {
-                instance = enableLocalMws.get(name);
-                if (!instance) {
+                instanceOpts = enableLocalMws.get(name);
+                if (!instanceOpts) {
                     return;
                 }
                 if (localMwCache.has(name)) {
                     mwList.push(localMwCache.get(name)); // get local middleware instance from cache 
                 }
                 else {
-                    mwList.push(new instance.instance(instance.options)); // store enable local instance to variable mwList
-                    localMwCache.set(name, new instance.instance(instance.options)); // cache executed local middleware for 
+                    if (instanceOpts.arguments && instanceOpts.arguments.length) {
+                        instance = fs_1.create.apply(null, [instanceOpts.instance].concat(instanceOpts.arguments));
+                    }
+                    else {
+                        instance = instanceOpts.instance;
+                    }
+                    mwList.push(instance); // store enable local instance to variable mwList
+                    localMwCache.set(name, instance); // cache executed local middleware for 
                 }
             }
             ;

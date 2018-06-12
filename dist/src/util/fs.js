@@ -3,6 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const path_1 = require("path");
 const es6_promise_1 = require("es6-promise");
+exports.create = (cb, ...arg) => {
+    try {
+        return new cb(...arg);
+    }
+    catch (_a) {
+        return cb(...arg);
+    }
+};
 /**
  * 根据文件地址 异步的动态引入文件 并返回promise.resolve(default对象)
  * @param file : 文件地址

@@ -1,6 +1,6 @@
 
 import { global, local, mwItem, globalV, localV } from '../config/default';
-import { getFiles, importFile } from '../util/fs'
+import { getFiles, importFile, create } from '../util/fs'
 import { middlewareI, configI, Map } from '../interface'
 import { join } from 'path';
 import { compose } from './compose';
@@ -17,14 +17,14 @@ export class MwLoader {
   private enableGMwList: Array<any> = []; // the collection of all enbaled global middleware instance
   private localMwCache: Map<string, middlewareI> = new Map(); // the cache map of the executed local middleware
   private mwDir: string; // the storeage directory of all middlewares
-  private configuration: string; // the path of configuration file
+  private configuration: string | configI; // the path of configuration file
 
   /**
    * middleware loader module
    * @param confFile  the path of configuration file: save the middleware configuration information 
    * @param mwDir the storage directory of all middlewares
    */
-  constructor(confFile: string, mwDir: string) {
+  constructor(confFile: string | configI, mwDir: string) {
     this.configuration = confFile;
     this.mwDir = mwDir;
   }
@@ -33,9 +33,14 @@ export class MwLoader {
    * @param confFile 
    */
   private async run() {
+    let config = {};
     console.log(`middleware loader module read config file success`);
-    const conf = await importFile(this.configuration); // import the configuration file of all middleware 
-    conf && this.setConf(conf as configI); // cache configuration
+    if (typeof this.configuration === 'string') {
+      config = await importFile(this.configuration); // import the configuration file of all middleware 
+    } else {
+      config = this.configuration;
+    }
+    config && this.setConf(config as configI); // cache configuration
     await this.gatherEnableGMws(); //  gather all of the enabled global middleware
     await this.gatherEnableLMws(); // cache all middleware instance 
   }
@@ -65,13 +70,19 @@ export class MwLoader {
       enableGMwList = this.enableGMwList,
       enableGMwConfs = this.enableGMwConfs;
     enableGMws.clear();
+    let instance:any = null;
     for (let m of enableGMwConfs) {
       await importFile(m.package || join(process.cwd(), mwDir, m.name)).then(instance => {
         if (!enableGMws.has(m.name)) {
           //gather the middleware instance collection to the map warehouse named enableGMWs
           enableGMws.set(m.name, {...m, instance }); 
           // storage all enabled middleware instance
-          enableGMwList.push(new ((enableGMws.get(m.name) || {instance}).instance)(m.options));
+          if (m.arguments && m.arguments.length) {
+            instance = create.apply(null, [(enableGMws.get(m.name) || {instance}).instance].concat(m.arguments));
+          } else {
+            instance = m.instance;
+          }
+          enableGMwList.push(instance);
         } else {
           console.error(`the glabal middleware: ${m.name} has been defined!`);
         }
@@ -148,18 +159,24 @@ export class MwLoader {
     // in the process of the request, use variable mwList to store all valid middleware
     const mwList: Array<any> = this.getEnableGMwList().concat([]); // the initial value is enabled global middleware list
     const localMwCache = this.getLocalMwCache(); // the cache for local middleware
-    let instance = null;
+    let instanceOpts:any = null;
+    let instance:any = null;
     localMws.forEach(name => {
       if (enableLocalMws.has(name)) { // filter disabled local middleware 
-        instance = enableLocalMws.get(name);
-        if (!instance) {
+        instanceOpts = enableLocalMws.get(name);
+        if (!instanceOpts) {
           return;
         }
         if (localMwCache.has(name)) {
           mwList.push(localMwCache.get(name)); // get local middleware instance from cache 
         } else {
-          mwList.push(new instance.instance(instance.options)); // store enable local instance to variable mwList
-          localMwCache.set(name, new instance.instance(instance.options)); // cache executed local middleware for 
+          if (instanceOpts.arguments && instanceOpts.arguments.length) {
+            instance = create.apply(null, [instanceOpts.instance].concat(instanceOpts.arguments));
+          } else {
+            instance = instanceOpts.instance;
+          }
+          mwList.push(instance); // store enable local instance to variable mwList
+          localMwCache.set(name, instance); // cache executed local middleware for 
         }
       };
     });

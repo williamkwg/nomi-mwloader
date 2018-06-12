@@ -3,6 +3,13 @@ import { join, extname } from 'path';
 import { Promise } from 'es6-promise';
 import { resolve } from 'url';
 
+export const create = (cb:any, ...arg:any[]) => {
+  try {
+    return new cb(...arg);
+  } catch {
+    return cb(...arg);
+  }
+}
 /**
  * 根据文件地址 异步的动态引入文件 并返回promise.resolve(default对象)
  * @param file : 文件地址
