@@ -1,8 +1,8 @@
 {
   "name": "nomi-mwloader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "nomi框架 中间件loader",
-  "main": "./dist/test/index.js",
+  "main": "./dist/src/lib/MwLoader.js",
   "scripts": {
     "start": "node ./dist/test/index.js"
   },
