@@ -61,7 +61,7 @@ class MwLoader {
     async gatherEnableGMws() {
         const enableGMws = this.getEnableGlobalMws(), mwDir = this.mwDir, enableGMwList = this.enableGMwList, enableGMwConfs = this.enableGMwConfs;
         enableGMws.clear();
-        let instanceObj = null;
+        let instance = null;
         for (let m of enableGMwConfs) {
             await fs_1.importFile(m.package || path_1.join(process.cwd(), mwDir, m.name)).then(instance => {
                 if (!enableGMws.has(m.name)) {
@@ -69,12 +69,12 @@ class MwLoader {
                     enableGMws.set(m.name, Object.assign({}, m, { instance }));
                     // storage all enabled middleware instance
                     if (m.arguments && m.arguments.length) {
-                        instanceObj = fs_1.create.apply(null, [(enableGMws.get(m.name) || { instance }).instance].concat(m.arguments));
+                        instance = fs_1.create.apply(null, [(enableGMws.get(m.name) || { instance }).instance].concat(m.arguments));
                     }
                     else {
-                        instanceObj = m.instance;
+                        instance = m.instance;
                     }
-                    enableGMwList.push(instanceObj);
+                    enableGMwList.push(instance);
                 }
                 else {
                     console.error(`the glabal middleware: ${m.name} has been defined!`);
@@ -186,4 +186,4 @@ class MwLoader {
         return (context, next) => action();
     }
 }
-exports.MwLoader = MwLoader;
+exports.default = MwLoader;

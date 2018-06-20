@@ -4,10 +4,8 @@ import { getFiles, importFile, create } from '../util/fs'
 import { middlewareI, configI, Map } from '../interface'
 import { join } from 'path';
 import { compose } from './compose';
-import middleware from '../../test/config/middleware';
-import { V4MAPPED } from 'dns';
 
-export class MwLoader {
+export default class MwLoader {
   private global: Array<middlewareI> = []; // the configuration collection of all global middleware 
   private local: Array<middlewareI> = [];  // the configuration collection of all local middleware
   private enableGMwConfs: Array<middlewareI> = []; // the configuration collection of the all enabled global middleware
