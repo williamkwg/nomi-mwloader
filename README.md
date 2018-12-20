@@ -40,5 +40,4 @@ mwLoader.use(ctx, 'LMiddleware', () => {
   // to do something
 });
 
-exports.OrderController = OrderController;
 ```
