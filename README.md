@@ -1,17 +1,44 @@
-#### ***文中链接各位根据自己项目对应修改***
---------------------------------------------------------------------------------
-#### **项目管理**：
-#### *sp*:(http://sp.corp.qunar.com/default.aspx)<br />
+# nomi-mwloader
 
-#### *jira*:(http://task.corp.qunar.com/browse/)<br />
---------------------------------------------------------------------------------
-#### **发布相关**:
-#### *devbds*:(http://devbds.corp.qunar.com/jenkins/)<br />
-#### *bds*:(http://bds.corp.qunar.com/jenkins/)<br />
---------------------------------------------------------------------------------
-#### **质量管理**:
-#### *bugfree*:(http://svn.corp.qunar.com/bugfree)<br />
-#### *case*:(http://bugfree.corp.qunar.com/bugfree/index.php/case)<br />
---------------------------------------------------------------------------------
-#### **项目信息**:
-#### *wiki*:(http://wiki.corp.qunar.com/)<br />
+the middleware-loader tool for loading the nomi middlewares!
+
+## Installation
+
+``` bash
+$ npm install nomi-mwloader --save
+```
+
+Node.js >= 8.0.0  required.
+
+## API
+
+- use
+
+## Usage
+
+``` javascript
+
+const MiddlewareLoader = require('nomi-mwloader');
+const ctx = new Koa().ctx;
+const mwLoader = new MiddlewareLoader({
+      "global": [
+        {
+          "name": "GMiddleware", 
+          "enable": true
+        }],
+      "local": [ 
+        {
+          "name": 'LMiddleware',
+          "enable": true
+        }
+      ] 
+    }, 'd:app');
+
+mwLoader.use(ctx, 'LMiddleware');
+mwLoader.use(ctx, ['LMiddleware']);
+mwLoader.use(ctx, 'LMiddleware', () => {
+  // to do something
+});
+
+exports.OrderController = OrderController;
+```

@@ -1,6 +1,6 @@
 {
   "name": "nomi-mwloader",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "nomi框架 中间件loader",
   "main": "./dist/src/lib/MwLoader.js",
   "scripts": {
@@ -8,16 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.corp.qunar.com:fe/nomi-mwloader.git"
+    "url": "https://github.com/williamkwg/nomi-mwloader.git",
+    "innerurl": "git@gitlab.corp.qunar.com:fe/nomi-mwloader.git"
   },
   "keywords": [
     "nomi",
     "middleware",
     "loader",
-    "koa",
-    "node"
+    "nomi-middlware",
+    "middleware-loader",
+    "nomi-middleware-loader"
   ],
   "author": "weiguo.kong",
+  "email": "weiguo.kong@qunar.com",
   "license": "ISC",
   "dependencies": {
     "es6-promise": "^4.2.4"
