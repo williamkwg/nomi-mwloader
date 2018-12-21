@@ -111,22 +111,22 @@ export default class MwLoader {
   }
   /** getter */
   private getGlobal() {
-    return this.global;
+    return this.global || [];
   }
   private getLocal() {
-    return this.local;
+    return this.local || [];
   }
   private getEnableGlobalMws() {
-    return this.enableGMws;
+    return this.enableGMws || new Map();
   }
   private getEnableLocalMws() {
-    return this.enableLocalMws;
+    return this.enableLocalMws || new Map();
   }
   private getEnableGMwList() {
-    return this.enableGMwList;
+    return this.enableGMwList || [];
   }
   private getLocalMwCache() {
-    return this.localMwCache;
+    return this.localMwCache || new Map();
   }
   /** setter */
   private setGlobal(mws: Array<middlewareI> = global) {
@@ -148,7 +148,7 @@ export default class MwLoader {
    * @param localMws local middleware list for one request
    * @param action the action of local controller 
    */
-  async use(ctx: Object, localMws: string | Array<string>, action?: Function) {
+  async use(ctx: Object, localMws: string | Array<string> = [], action?: Function) {
     if (typeof localMws === 'string') {
       localMws = [localMws];
     }
