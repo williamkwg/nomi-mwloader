@@ -1,6 +1,6 @@
 {
   "name": "nomi-mwloader",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "nomi框架 中间件loader",
   "main": "./dist/src/lib/MwLoader.js",
   "scripts": {
@@ -8,8 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/williamkwg/nomi-mwloader.git",
-    "innerurl": "git@gitlab.corp.qunar.com:fe/nomi-mwloader.git"
+    "url": "https://github.com/williamkwg/nomi-mwloader.git"
   },
   "keywords": [
     "nomi",
