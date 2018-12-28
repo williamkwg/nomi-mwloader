@@ -19,9 +19,14 @@ export const importFile = (file: string) => {
     import(file).then(result => {
       if (result && result.default) {
         resolve(result.default);
+      } else {
+        resolve(result);
       }
-      reject(result);
+      if (!result) {
+        reject({});
+      }
     }).catch(err => {
+      reject({});
       console.log('read file error, uri:', file);
     });
   });
